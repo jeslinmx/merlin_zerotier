@@ -102,13 +102,20 @@ Once the router comes back up, the `ping` command above should work. (If you
 stop ping with CTRL-C now it may kill the zerotier daemon but because our
 scripts are now installed, it should restart shortly.) Now you should be able to
 connect to the router from another client on your zerotier network via SSH or
-Web GUI using the router's zerotier IP address. To connect to LAN clients from
-outside, just use their LAN IP address. In order to do this, you'll have to set
-up a custom route on your zerotier clients outside the LAN. The way to do this
-depends on the OS of your client, but for example, the command on MacOS is `sudo
-route add <LAN IP range> <zerotier router IP>`. It may be tempting to add the
-route to `Managed Routes` in your zerotier dashboard, but [we recommend against
-that](#dont-use-zerotier-managed-routes).
+Web GUI using the router's zerotier IP address.
+
+To connect to LAN clients from zerotier, you'll have to set up appropriate Managed
+Routes in your zerotier dashboard. Under `Advanced > Managed Routes`, fill out
+your LAN network and subnet as the Destination, and your router's zerotier IP as
+Via. On your router, edit `/opt/var/lib/zerotier-one/networks.d/<Network ID>.local
+.conf`, and replace `allowManaged=1` with `allowManaged=<zerotier network IP
+range>/<subnet>`. This prevents your router from picking up this route
+automatically and trying to route LAN traffic through itself via zerotier.
+
+You can also do this manually by adding a custom route on each of your zerotier
+clients outside the LAN. The way to do this depends on the OS of your client,
+but for example, the command on MacOS is `sudo route add <LAN IP range> <zerotier
+router IP>`.
 
 ## Connect two LANs
 
@@ -143,10 +150,7 @@ See [this page for further
 information](https://zerotier.atlassian.net/wiki/spaces/SD/pages/7110693/Overriding+Default+Route+Full+Tunnel+Mode). [Also see this...](https://www.digitalocean.com/community/tutorials/getting-started-software-defined-networking-creating-vpn-zerotier-one)
 
 ## Hints and Tips:
-#### Don’t use Zerotier Managed Routes
- Managed Routes are propagated to all zerotier clients, and will likely install
- inappropriate routes on your router that may cause inefficiencies or
- worse.
+
 #### Don’t nest Zerotier installations
 
 Don’t install zerotier on a router that is a client of your main router. If
